@@ -271,7 +271,7 @@ Pada latihan kedua, program meminta pengguna memasukkan nomor polisi yang ingin 
 
 ## Unguided
 
-### Membuat ADT Doubly Linked List, mencari elemen dengan nomor polisi D001, dan menghapus elemen dengan nomor polisi D003.
+### 1. Membuat ADT Doubly Linked List, mencari elemen dengan nomor polisi D001, dan menghapus elemen dengan nomor polisi D003.
 
 ##### Doublylist.h
 
@@ -549,10 +549,281 @@ int main() {
 
 Program ini menerapkan Doubly Linked List untuk mengelola data kendaraan yang terdiri dari nomor polisi, warna, dan tahun pembuatan. File Doublylist.h berisi deklarasi struktur data dan fungsi, sedangkan Doublylist.cpp berisi implementasi operasi linked list. File main.cpp digunakan untuk menjalankan latihan.
 
-Pada latihan pertama, program menerima empat data kendaraan dan memasukkannya ke akhir list menggunakan insertLast(). Sebelum data ditambahkan, fungsi findElm() memeriksa apakah nomor polisi sudah terdaftar. Fungsi printInfo() menampilkan data kendaraan dengan menelusuri list dari belakang ke depan menggunakan pointer prev.
+### 2. ADT Doubly Linked List Data Buku Program ini menyimpan data buku, memeriksa duplikasi kode buku, mencari B001, dan menghapus B003.
 
-Pada latihan kedua, fungsi findElm() digunakan untuk mencari kendaraan dengan nomor polisi D001. Jika ditemukan, informasi kendaraan ditampilkan. Pada latihan ketiga, fungsi deleteElm() digunakan untuk menghapus kendaraan dengan nomor polisi D003. Proses penghapusan disesuaikan dengan posisi node, yaitu menggunakan deleteFirst(), deleteLast(), atau deleteAfter(). Setelah penghapusan, program menampilkan data yang tersisa dan membebaskan memori node sebelum berakhir.
 
+##### File Buku.h
+```cpp
+#ifndef BUKU_H
+#define BUKU_H
+
+#include <iostream>
+#include <string>
+
+#define Nil NULL
+
+struct infotype {
+    std::string kodeBuku;
+    std::string judul;
+    int thnTerbit;
+};
+
+typedef struct ElmList *address;
+
+struct ElmList {
+    infotype info;
+    address next;
+    address prev;
+};
+
+struct List {
+    address First;
+    address Last;
+};
+
+void CreateList(List &L);
+address alokasi(infotype x);
+void dealokasi(address &P);
+void printInfo(List L);
+void insertLast(List &L, address P);
+address findElm(List L, infotype x);
+void deleteFirst(List &L, address &P);
+void deleteLast(List &L, address &P);
+void deleteAfter(address Prec, address &P);
+void deleteElm(List &L, std::string kodeBuku, bool &status);
+
+#endif
+```
+
+##### File Buku.cpp
+```cpp
+#include "Buku.h"
+
+void CreateList(List &L) {
+    L.First = Nil;
+    L.Last = Nil;
+}
+
+address alokasi(infotype x) {
+    address P = new ElmList;
+    P->info = x;
+    P->next = Nil;
+    P->prev = Nil;
+    return P;
+}
+
+void dealokasi(address &P) {
+    if (P != Nil) {
+        delete P;
+        P = Nil;
+    }
+}
+
+void printInfo(List L) {
+    address P = L.Last;
+
+    if (P == Nil) {
+        std::cout << "List kosong." << std::endl;
+        return;
+    }
+
+    while (P != Nil) {
+        std::cout << "Kode Buku    : " << P->info.kodeBuku << std::endl;
+        std::cout << "Judul        : " << P->info.judul << std::endl;
+        std::cout << "Tahun Terbit : " << P->info.thnTerbit << std::endl << std::endl;
+        P = P->prev;
+    }
+}
+
+void insertLast(List &L, address P) {
+    if (P == Nil) return;
+
+    if (L.First == Nil) {
+        L.First = P;
+        L.Last = P;
+    } else {
+        P->prev = L.Last;
+        L.Last->next = P;
+        L.Last = P;
+    }
+}
+
+address findElm(List L, infotype x) {
+    address P = L.First;
+
+    while (P != Nil) {
+        if (P->info.kodeBuku == x.kodeBuku) return P;
+        P = P->next;
+    }
+
+    return Nil;
+}
+
+void deleteFirst(List &L, address &P) {
+    if (L.First == Nil) {
+        P = Nil;
+        return;
+    }
+
+    P = L.First;
+
+    if (L.First == L.Last) {
+        L.First = Nil;
+        L.Last = Nil;
+    } else {
+        L.First = P->next;
+        L.First->prev = Nil;
+    }
+
+    P->next = Nil;
+    P->prev = Nil;
+}
+
+void deleteLast(List &L, address &P) {
+    if (L.Last == Nil) {
+        P = Nil;
+        return;
+    }
+
+    P = L.Last;
+
+    if (L.First == L.Last) {
+        L.First = Nil;
+        L.Last = Nil;
+    } else {
+        L.Last = P->prev;
+        L.Last->next = Nil;
+    }
+
+    P->next = Nil;
+    P->prev = Nil;
+}
+
+void deleteAfter(address Prec, address &P) {
+    if (Prec == Nil || Prec->next == Nil) {
+        P = Nil;
+        return;
+    }
+
+    P = Prec->next;
+    Prec->next = P->next;
+
+    if (P->next != Nil) P->next->prev = Prec;
+
+    P->next = Nil;
+    P->prev = Nil;
+}
+
+void deleteElm(List &L, std::string kodeBuku, bool &status) {
+    address P = L.First;
+    status = false;
+
+    while (P != Nil && P->info.kodeBuku != kodeBuku) {
+        P = P->next;
+    }
+
+    if (P == Nil) return;
+
+    if (P == L.First) {
+        deleteFirst(L, P);
+    } else if (P == L.Last) {
+        deleteLast(L, P);
+    } else {
+        deleteAfter(P->prev, P);
+    }
+
+    dealokasi(P);
+    status = true;
+}
+```
+
+##### File main.cpp
+```cpp
+#include <iostream>
+#include "Buku.h"
+
+using namespace std;
+
+void inputData(List &L) {
+    infotype data;
+
+    cout << "masukkan kode buku: ";
+    cin >> data.kodeBuku;
+    cout << "masukkan judul buku: ";
+    cin >> data.judul;
+    cout << "masukkan tahun terbit: ";
+    cin >> data.thnTerbit;
+
+    if (findElm(L, data) == Nil) {
+        insertLast(L, alokasi(data));
+    } else {
+        cout << "kode buku sudah terdaftar" << endl;
+    }
+
+    cout << endl;
+}
+
+int main() {
+    List L;
+    CreateList(L);
+
+    for (int i = 0; i < 4; i++) {
+        inputData(L);
+    }
+
+    cout << "DATA LIST 1" << endl;
+    printInfo(L);
+
+    infotype cari;
+    cout << "Masukkan Kode Buku yang dicari : ";
+    cin >> cari.kodeBuku;
+
+    address P = findElm(L, cari);
+
+    if (P != Nil) {
+        cout << "\nKode Buku    : " << P->info.kodeBuku << endl;
+        cout << "Judul        : " << P->info.judul << endl;
+        cout << "Tahun Terbit : " << P->info.thnTerbit << endl;
+    } else {
+        cout << "Data buku tidak ditemukan." << endl;
+    }
+
+    string kodeHapus;
+    bool status;
+
+    cout << "\nMasukkan Kode Buku yang akan dihapus : ";
+    cin >> kodeHapus;
+    deleteElm(L, kodeHapus, status);
+
+    if (status) {
+        cout << "Data dengan kode buku " << kodeHapus
+             << " berhasil dihapus." << endl;
+    } else {
+        cout << "Data dengan kode buku " << kodeHapus
+             << " tidak ditemukan." << endl;
+    }
+
+    cout << "\nDATA LIST 1" << endl;
+    printInfo(L);
+
+    while (L.First != Nil) {
+        address nodeHapus;
+        deleteFirst(L, nodeHapus);
+        dealokasi(nodeHapus);
+    }
+
+    return 0;
+}
+```
+### Output Unguided 2
+
+#### Output 1
+
+![Screenshot Output Unguided 2](https://github.com/Farrel-13/Laporan_Praktikum06/blob/main/Output/output202.png?raw=true)
+
+![Screenshot Output Unguided 2](https://github.com/Farrel-13/Laporan_Praktikum06/blob/main/Output/output201.png?raw=true)
+
+Program menggunakan Doubly Linked List untuk menyimpan data buku yang terdiri dari kode buku, judul, dan tahun terbit. Buku.h berisi deklarasi struktur dan fungsi, sedangkan Buku.cpp berisi implementasi operasi list. main.cpp digunakan untuk menerima input, memeriksa duplikasi kode buku, mencari buku, menghapus data, dan menampilkan isi list.
 
 ## Kesimpulan
 
