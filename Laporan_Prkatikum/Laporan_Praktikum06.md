@@ -542,8 +542,9 @@ int main() {
 
 #### Output 1
 
-![Screenshot Output Unguided 1](https://github.com/Farrel-13/Laporan_Praktikum06/blob/main/foto_output/ouputno1.png?raw=true)
-![Screenshot Output Unguided 1](https://github.com/Farrel-13/Laporan_Praktikum06/blob/main/foto_output/ouputno2.png?raw=true)
+![Screenshot Output Unguided 1](https://github.com/Farrel-13/Laporan_Praktikum06/blob/main/Output/output01.png?raw=true)
+
+![Screenshot Output Unguided 1](https://github.com/Farrel-13/Laporan_Praktikum06/blob/main/Output/output02.png?raw=true)
 
 
 Program ini menerapkan Doubly Linked List untuk mengelola data kendaraan yang terdiri dari nomor polisi, warna, dan tahun pembuatan. File Doublylist.h berisi deklarasi struktur data dan fungsi, sedangkan Doublylist.cpp berisi implementasi operasi linked list. File main.cpp digunakan untuk menjalankan latihan.
